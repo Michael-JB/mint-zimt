@@ -1,0 +1,25 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
+
+      - name: Nightly
+        run: bash .mint-zimt/nightly.sh
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

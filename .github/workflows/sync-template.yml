@@ -1,0 +1,30 @@
+name: Sync from template
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Every night at 2am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fetch template
+        run: |
+          git remote add template https://github.com/Michael-JB/mint-zimt.git
+          git fetch template main --depth=1
+          git rm -r --cached .mint-zimt/ 2>/dev/null || true
+          git checkout FETCH_HEAD -- .mint-zimt/ README.md
+
+      - name: Commit and push if changed
+        run: |
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "sync from template"
+          git push
